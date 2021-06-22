@@ -891,7 +891,9 @@ def lex(module=None, object=None, debug=False, optimize=False, lextab='lextab',
         ldict = dict(_items)
         # If no __file__ attribute is available, try to obtain it from the __module__ instead
         if '__file__' not in ldict:
-            ldict['__file__'] = sys.modules[ldict['__module__']].__file__
+            module = sys.modules[ldict['__module__']]
+            if hasattr(module, '__file__'):
+                ldict['__file__'] = module.__file__
     else:
         ldict = get_caller_module_dict(2)
 
@@ -1032,7 +1034,7 @@ def lex(module=None, object=None, debug=False, optimize=False, lextab='lextab',
                 srcfile = lextab.__file__
             else:
                 if '.' not in lextab:
-                    srcfile = ldict['__file__']
+                    srcfile = ldict.get('__file__', '')
                 else:
                     parts = lextab.split('.')
                     pkgname = '.'.join(parts[:-1])
